@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+">
+
+    <import resource="classpath*:spring/*-context.xml"/>
+
+    <context:component-scan base-package="example.twopc"/>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean id="dbInit" class="org.springframework.jdbc.datasource.init.DataSourceInitializer">
+        <property name="dataSource">
+            <bean class="org.h2.jdbcx.JdbcDataSource">
+                <property name="url" value="jdbc:h2:file:./h2db1;TRACE_LEVEL_FILE=4"/>
+            </bean>
+        </property>
+        <property name="databasePopulator">
+            <bean class="org.springframework.jdbc.datasource.init.ResourceDatabasePopulator">
+                <property name="scripts">
+                    <list>
+                        <value>classpath:db/db.sql</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="sessionTransacted" value="true"/>
+    </bean>
+
+    <bean id="bitronixTransactionManager" class="bitronix.tm.TransactionManagerServices"
+          factory-method="getTransactionManager" destroy-method="shutdown"/>
+
+    <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+        <property name="transactionManager" ref="bitronixTransactionManager"/>
+        <property name="userTransaction" ref="bitronixTransactionManager"/>
+    </bean>
+
+    <bean id="dataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource">
+        <property name="className" value="org.h2.jdbcx.JdbcDataSource"/>
+        <property name="uniqueName" value="db1"/>
+        <property name="minPoolSize" value="1"/>
+        <property name="maxPoolSize" value="5"/>
+        <property name="allowLocalTransactions" value="false"/>
+        <property name="driverProperties">
+            <props>
+                <prop key="url">jdbc:h2:file:./h2db1;TRACE_LEVEL_FILE=4</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="connectionFactory" class="bitronix.tm.resource.jms.PoolingConnectionFactory">
+        <property name="className" value="org.apache.activemq.ActiveMQXAConnectionFactory"/>
+        <property name="uniqueName" value="mq1"/>
+        <property name="minPoolSize" value="1"/>
+        <property name="maxPoolSize" value="5"/>
+        <property name="allowLocalTransactions" value="false"/>
+        <property name="driverProperties">
+            <props>
+                <prop key="brokerURL">vm://localhost?broker.persistent=false&amp;broker.useShutdownHook=false</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="queue" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="QUEUE1"/>
+    </bean>
+
+</beans>

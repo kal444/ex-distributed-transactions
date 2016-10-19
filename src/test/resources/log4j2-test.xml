@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{2} - %msg%n"/>
+        </Console>
+        <File name="LogFile" fileName="test.log" append="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{2} - %msg%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Logger name="example.twopc" level="debug"/>
+        <Logger name="org.springframework.transaction" level="debug"/>
+        <Logger name="bitronix.tm.twopc" level="debug"/>
+        <!--<Root level="error">-->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="LogFile"/>
+        </Root>
+    </Loggers>
+</Configuration>
