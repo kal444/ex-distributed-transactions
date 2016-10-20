@@ -26,4 +26,9 @@ public class TwoPhaseCommitIT {
     public void test_something_bad() throws Exception {
         target.doSomethingBad();
     }
+
+    @Test(expected = Exception.class)
+    public void test_something_bad_no_distributed_trasnaction() throws Exception {
+        target.doSomethingBadWithoutDistributedTransaction();
+    }
 }
