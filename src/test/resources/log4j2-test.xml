@@ -12,8 +12,7 @@
         <Logger name="example.twopc" level="debug"/>
         <Logger name="org.springframework.transaction" level="debug"/>
         <Logger name="bitronix.tm.twopc" level="debug"/>
-        <!--<Root level="error">-->
-        <Root level="info">
+        <Root level="error">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="LogFile"/>
         </Root>
