@@ -36,6 +36,7 @@ public class GenericallyNamedServciceImpl {
         jmsOperations.convertAndSend("QUEUE1", "Test Message");
 
         LOG.debug("Writing to Database");
+        // this will cause Unique Key Constraint violation
         jdbcOperations.execute("INSERT INTO PERSON (ID, NAME) VALUES (PERSON_SEQ.NEXTVAL, 'Mickey')");
 
     }
